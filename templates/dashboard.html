@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Tableau de bord</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <img src="/static/img/Fichier%202.png" alt="First Trust Savings & Loan">
+        </div>
+        <div class="header-right">
+            <span class="user-info">{{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Déconnexion</a>
+        </div>
+    </header>
+
+    <h1>Tableau de bord</h1>
+        <div class="filter-section">
+            <input type="text" id="searchInput" placeholder="Rechercher...">
+            <select id="filterType">
+                <option value="all">Tous les champs</option>
+                <option value="nom">Nom</option>
+                <option value="prenom">Prénom</option>
+                <option value="poste">Poste</option>
+                <option value="agence">Agence</option>
+            </select>
+        </div>
+    <div>
+        <button id="openAddForm" class="add">Ajouter Contact</button>
+    </div>
+
+    <div id="addContactForm" class="modal">
+        <form method="POST" action="/add_contact" class="modal-content">
+            <span class="close" id="closeAddForm">&times;</span>
+            <h2>Ajouter un Contact</h2>
+            <input type="text" name="nom" placeholder="Nom" required>
+            <input type="text" name="prenom" placeholder="Prénom" required>
+            <input type="text" name="telephone" placeholder="Téléphone" required>
+            <input type="text" name="poste" placeholder="Poste" required>
+            <input type="text" name="agence" placeholder="Agence" required>
+            <button type="submit" class="add">Ajouter</button>
+        </form>
+    </div>
+
+    <table id="contactsTable">
+        <thead>
+            <tr>
+                <th class="sortable" data-column="nom">Nom &#x25B2;&#x25BC;</th>
+                <th class="sortable" data-column="prenom">Prénom &#x25B2;&#x25BC;</th>
+                <th>Téléphone</th>
+                <th class="sortable" data-column="poste">Poste &#x25B2;&#x25BC;</th>
+                <th class="sortable" data-column="agence">Agence &#x25B2;&#x25BC;</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contact in contacts %}
+            <tr>
+                <td>{{ contact.nom }}</td>
+                <td>{{ contact.prenom }}</td>
+                <td>{{ contact.telephone }}</td>
+                <td>{{ contact.poste }}</td>
+                <td>{{ contact.agence }}</td>
+                <td>
+                    <button class="editButton" 
+                            data-id="{{ contact.id }}"
+                            data-nom="{{ contact.nom }}"
+                            data-prenom="{{ contact.prenom }}"
+                            data-telephone="{{ contact.telephone }}"
+                            data-poste="{{ contact.poste }}"
+                            data-agence="{{ contact.agence }}">
+                        Modifier
+                    </button>
+                    <a href="/delete_contact/{{ contact.id }}" class="deleteButton">
+                        <button class="delete">Supprimer</button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div id="editContactForm" class="modal">
+        <form method="POST" action="/edit_contact" class="modal-content" id="editForm">
+            <span class="close" id="closeEditForm">&times;</span>
+            <h2>Modifier un Contact</h2>
+            <input type="hidden" id="editContactId" name="id">
+            <input type="text" id="editNom" name="nom" required placeholder="Nom">
+            <input type="text" id="editPrenom" name="prenom" required placeholder="Prénom">
+            <input type="text" id="editTelephone" name="telephone" required placeholder="Téléphone">
+            <input type="text" id="editPoste" name="poste" required placeholder="Poste">
+            <input type="text" id="editAgence" name="agence" required placeholder="Agence">
+            <button type="submit">Modifier</button>
+        </form>
+    </div>
+
+    <script src="/static/js/scripts.js"></script>
+</body>
+</html>

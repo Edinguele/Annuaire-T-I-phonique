@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Annuaire Téléphonique</title>
+</head>
+<body>
+    <header>
+        <img src="/static/img/Fichier%202.png" alt="First Trust Savings & Loan">
+        <div class="language">
+            <a href="/login" target="_blank" rel="noopener noreferrer">
+                <button>Se connecter</button>
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Annuaire Téléphonique</h1>
+        <div class="filter-section">
+            <input type="text" id="searchInput" placeholder="Rechercher...">
+            <select id="filterType">
+                <option value="all">Tous les champs</option>
+                <option value="nom">Nom</option>
+                <option value="prenom">Prénom</option>
+                <option value="poste">Poste</option>
+                <option value="agence">Agence</option>
+            </select>
+        </div>
+        <table id="contactsTable">
+            <thead>
+                <tr>
+                    <th class="sortable" data-column="nom">Nom &#x25B2;&#x25BC;</th>
+                    <th class="sortable" data-column="prenom">Prénom &#x25B2;&#x25BC;</th>
+                    <th>Téléphone</th>
+                    <th class="sortable" data-column="poste">Poste &#x25B2;&#x25BC;</th>
+                    <th class="sortable" data-column="agence">Agence &#x25B2;&#x25BC;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in contacts|sort(attribute='nom') %}
+                <tr>
+                    <td>{{ contact.nom }}</td>
+                    <td>{{ contact.prenom }}</td>
+                    <td>{{ contact.telephone }}</td>
+                    <td>{{ contact.poste }}</td>
+                    <td>{{ contact.agence }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const filterType = document.getElementById('filterType').value;
+            const rows = document.querySelectorAll('#contactsTable tbody tr');
+
+            rows.forEach(row => {
+                let text = '';
+                if (filterType === 'all') {
+                    text = row.textContent.toLowerCase();
+                } else {
+                    const index = {
+                        'nom': 0,
+                        'prenom': 1,
+                        'poste': 3,
+                        'agence': 4
+                    }[filterType];
+                    text = row.cells[index].textContent.toLowerCase();
+                }
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+
+        document.querySelectorAll('.sortable').forEach(header => {
+            header.addEventListener('click', function() {
+                const column = this.dataset.column;
+                const tbody = document.querySelector('#contactsTable tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const index = {
+                    'nom': 0,
+                    'prenom': 1,
+                    'poste': 3,
+                    'agence': 4
+                }[column];
+                const isAscending = this.classList.contains('asc');
+                rows.sort((a, b) => {
+                    const textA = a.cells[index].textContent.toLowerCase();
+                    const textB = b.cells[index].textContent.toLowerCase();
+                    return isAscending ?
+                        textB.localeCompare(textA) :
+                        textA.localeCompare(textB);
+                });
+                document.querySelectorAll('.sortable').forEach(h => h.classList.remove('asc', 'desc'));
+                this.classList.toggle('asc', !isAscending);
+                this.classList.toggle('desc', isAscending);
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        });
+    </script>
+
+</body>
+</html>
